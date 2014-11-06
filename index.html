@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Screenplay by weefbellington</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Screenplay</h1>
+        <h2>Screen transitions, paging and modal layouts for Square&#39;s Flow</h2>
+        <a href="https://github.com/weefbellington/screenplay" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="screenplay" class="anchor" href="#screenplay" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenplay</h1>
+
+<p>Screenplay is a companion library to Square's <a href="http://corner.squareup.com/2014/01/mortar-and-flow.html">Flow</a>. Where Flow provides
+the essential elements for building a View-based navigation flow, Screenplay assembles these into
+higher-level components for building animated screen transitions. The core features that Screenplay
+supports are:</p>
+
+<ul>
+<li>
+<strong>Paged</strong> (full-screen) navigation flows</li>
+<li>
+<strong>Modal</strong> (pop-up) navigation flows</li>
+<li>
+<strong>Animated</strong> <strong>transitions</strong> for incoming and outgoing views</li>
+<li>
+<strong>View</strong> <strong>state</strong> <strong>reattachment</strong> for configuration changes</li>
+</ul>
+
+<p>Displaying a screen in Screenplay consists of four discrete phases:</p>
+
+<ol>
+<li>A <code>Scene</code> creates the view,</li>
+<li>Scene <code>Components</code> receive callbacks and apply behavior</li>
+<li>The <code>Rigger</code> attaches the scene to the layout</li>
+<li>A <code>Transformer</code> plays animations between the incoming and outgoing scene.</li>
+</ol>
+
+<p>These steps are applied by the <code>Screenplay</code> object, which implements the <code>Flow.Listener</code> interface. The
+Screenplay object knows how to reverse these steps when the back button is pressed, and how to
+re-attach the screen state after a configuration change (such as rotating the phone from portrait to
+landscape mode).</p>
+
+<h3>
+<a id="setting-the-stage" class="anchor" href="#setting-the-stage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting the stage</h3>
+
+<p>App navigation using Screenplay is very straightforward. Begin by creating a <code>Screenplay.Director</code>.
+Pass this to the <code>Screenplay</code> and create a new <code>Flow</code>. In order to ensure that the Flow survives
+configuration changes, these objects should be stored outside of your main Activity. One way to do
+this is by putting them in the Application class:</p>
+
+<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">SampleApplication</span> <span class="k">extends</span> <span class="no">Application</span> {
+
+    <span class="k">public</span> <span class="k">final</span> <span class="kt">SimpleActivityDirector</span> director <span class="o">=</span> <span class="k">new</span> <span class="kt">SimpleActivityDirector</span>();
+    <span class="k">public</span> <span class="k">final</span> <span class="kt">Screenplay</span> screenplay <span class="o">=</span> <span class="k">new</span> <span class="kt">Screenplay</span>(director);
+    <span class="k">public</span> <span class="k">final</span> <span class="kt">Flow</span> mainFlow <span class="o">=</span> <span class="k">new</span> <span class="kt">Flow</span>(<span class="kt">Backstack</span><span class="o">.</span>single(<span class="k">new</span> <span class="kt">HomeScreen</span>()), screenplay);
+    <span class="k">private</span> <span class="kt">Application</span> application;
+
+    <span class="k">public</span> <span class="kt">void</span> <span class="nf">onCreate</span>() { application <span class="o">=</span> <span class="nb">this</span>; }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">SampleApplication</span> <span class="nf">getInstance</span>()   { <span class="k">return</span> application; }
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">Director</span> <span class="nf">getDirector</span>()            { <span class="k">return</span> getInstance()<span class="o">.</span>director; }
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">Screenplay</span> <span class="nf">getScreenplay</span>()        { <span class="k">return</span> getInstance()<span class="o">.</span>screenplay; }
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">Flow</span> <span class="nf">getMainFlow</span>()                { <span class="k">return</span> getInstance()<span class="o">.</span>flow; }
+}</pre></div>
+
+<p><em>(alternatively, use a dependency injection library such as <a href="http://square.github.io/dagger/">Dagger</a>)</em></p>
+
+<p>Then, in the onCreate() method of your main Activity, bind your <code>Director</code> and call
+<code>Screenplay.enter(flow)</code> to initialize the screen state:</p>
+
+<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MainActivity</span> <span class="k">extends</span> <span class="no">Activity</span> {
+    <span class="k">public</span> <span class="kt">void</span> <span class="nf">onCreate</span>(<span class="kt">Bundle</span> <span class="nv">savedInstanceState</span>) {
+        <span class="nb">super</span><span class="o">.</span>onCreate(savedInstanceState);
+
+        setContentView(<span class="kt">R</span><span class="o">.</span>id<span class="o">.</span>main);
+        <span class="kt">RelativeLayout</span> container <span class="o">=</span> (<span class="kt">RelativeLayout</span>) activity<span class="o">.</span>findViewById(<span class="kt">R</span><span class="o">.</span>id<span class="o">.</span>main);
+
+        <span class="kt">Director</span> director <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getDirector();
+        <span class="kt">Flow</span> flow <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getMainFlow();
+        <span class="kt">Screenplay</span> screenplay <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getScreenplay();
+
+        director<span class="o">.</span>bind(<span class="nb">this</span>, container);
+        screenplay<span class="o">.</span>enter(flow);
+    }
+}</pre></div>
+
+<p>Calling <code>enter</code> will initialize the Flow to the current screen, and also re-attach any Views that
+were detached during configuration changes.</p>
+
+<p>Once you've created your Flow, navigation is the same as in any other Flow application:</p>
+
+<div class="highlight highlight-java"><pre>    flow<span class="o">.</span>goTo(<span class="k">new</span> <span class="kt">DetailScene</span>()); <span class="c1">// animates forward to the DetailScene</span>
+    flow<span class="o">.</span>goUp();                  <span class="c1">// animate back to the parent of the scene</span>
+    flow<span class="o">.</span>goBack();                <span class="c1">// animate back to the previous scene</span></pre></div>
+
+<p>One final detail: when the Activity is destroyed, is important to drop references to it to
+avoid memory leaks. Using the <code>SimpleActivityDirector</code>, you can drop the old Activity reference by
+calling <code>unbind()</code> in your Activity's <code>onDestroy()</code> callback.</p>
+
+<div class="highlight highlight-java"><pre>    @<span class="kt">Override</span>
+    <span class="k">public</span> <span class="kt">void</span> onDestroy() {
+        <span class="nb">super</span><span class="o">.</span>onDestroy()
+        <span class="k">if</span> (isFinishing()) {
+            director<span class="o">.</span>unbind()
+        }
+    }</pre></div>
+
+<p>If you're using <code>MortarActivityDirector</code>, call <code>dropView()</code> instead. In either case, the Director
+should be rebound in <code>onCreate()</code>.</p>
+
+<h3>
+<a id="anatomy-of-a-scene" class="anchor" href="#anatomy-of-a-scene" aria-hidden="true"><span class="octicon octicon-link"></span></a>Anatomy of a Scene</h3>
+
+<p>The building block of a Screenplay app is a <code>Scene</code>. The Scene knows how to do
+only a few things by itself: create a View (<code>Scene.setUp</code>), destroy a View (<code>Scene.tearDown</code>) and get
+the current view (<code>Scene.getView</code>).</p>
+
+<p>The standard scene implementation uses Flow's <a href="https://github.com/square/flow/blob/master/flow/src/main/java/flow/Layouts.java">Layouts.createView()</a>
+to set up the scene. You can pass a list of <code>Component</code>s to the scene constructor, which can be used
+to apply behaviors after the scene is set up and before it is torn down:</p>
+
+<div class="highlight highlight-java"><pre>@Layout(<span class="kt">R</span><span class="o">.</span>layout<span class="o">.</span>dialog_scene)
+<span class="k">public</span> <span class="k">class</span> <span class="nc">DialogScene</span> <span class="k">extends</span> <span class="no">StandardScene</span> {
+    <span class="k">public</span> <span class="nf">DialogScene</span>(<span class="kt">DrawerLockingComponent</span> <span class="nv">component</span>) {
+        <span class="nb">super</span>(component);
+    }
+}</pre></div>
+
+<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">DrawerLockingComponent</span> <span class="k">implements</span> <span class="no">Scene</span>.<span class="no">Component</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="kt">DrawerPresenter</span> drawer;
+
+    <span class="k">public</span> <span class="nf">DrawerLockingComponent</span>(<span class="kt">DrawerPresenter</span> <span class="nv">drawer</span>) {
+        <span class="nb">this</span><span class="o">.</span>drawer <span class="o">=</span> drawer;
+    }
+
+    <span class="kt">@Override</span>
+    <span class="k">public</span> <span class="kt">void</span> <span class="nf">afterSetUp</span>(<span class="kt">Context</span> <span class="nv">context</span>, <span class="kt">Scene</span> <span class="nv">scene</span>) {
+        drawer<span class="o">.</span>setLocked(<span class="kc">true</span>);
+    }
+
+    <span class="kt">@Override</span>
+    <span class="k">public</span> <span class="kt">void</span> <span class="nf">beforeTearDown</span>(<span class="kt">Context</span> <span class="nv">context</span>, <span class="kt">Scene</span> <span class="nv">scene</span>) {
+        drawer<span class="o">.</span>setLocked(<span class="kc">false</span>);
+    }
+}
+</pre></div>
+
+<h3>
+<a id="riggers-and-transformers" class="anchor" href="#riggers-and-transformers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Riggers and Transformers</h3>
+
+<p>In a Screenplay app, when the application calls <code>Flow.goTo()</code> or <code>Flow.goBack()</code>, the type of layout
+change that is applied depends on the type of <code>Screen.Rigger</code> that is associated with the next
+scene. Screenplay provides two concrete <code>Rigger</code> implementations.</p>
+
+<ul>
+<li>The <code>PageRigger</code> manages full-screen layout changes. After all animations complete, the PageRigger
+removes the previous screen from its parent layout.</li>
+<li>The <code>ModalRigger</code> manages partial-screen layout changes. It does not remove the previous Scene
+from the layout, allowing you to layer Scenes on top of each other. This is useful for creating
+dialogs, drawers and multi-pane layouts.</li>
+</ul>
+
+<p>Both the <code>PagedRigger</code> and the <code>ModalRigger</code> remove the Scene at the top of the stack when <code>Flow.goBack()</code> is called.</p>
+
+<div class="highlight highlight-java"><pre>@Layout(<span class="kt">R</span><span class="o">.</span>layout<span class="o">.</span>navigation_drawer)
+<span class="k">public</span> <span class="k">class</span> <span class="nc">NavigationDrawerScene</span> <span class="k">extends</span> <span class="no">StandardScene</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="kt">ModalRigger</span> rigger;
+    <span class="k">private</span> <span class="k">final</span> <span class="kt">NavigationDrawerTransformer</span> transformer;
+
+    <span class="k">public</span> <span class="nf">NavigationDrawerScene</span>() {
+        <span class="nb">this</span><span class="o">.</span>rigger <span class="o">=</span> <span class="k">new</span> <span class="kt">ModalRigger</span>();
+        <span class="nb">this</span><span class="o">.</span>transformer <span class="o">=</span> <span class="k">new</span> <span class="kt">NavigationDrawerTransformer</span>();
+    }
+
+    <span class="kt">@Override</span>
+    <span class="k">public</span> <span class="kt">Rigger</span> <span class="nf">getRigger</span>() {
+        <span class="k">return</span> rigger;
+    }
+
+    <span class="kt">@Override</span>
+    <span class="k">public</span> <span class="kt">Transformer</span> <span class="nf">getTransformer</span>() {
+        <span class="k">return</span> transition;
+    }
+}</pre></div>
+
+<p>A <code>Transformer</code> is responsible for applying animations between Stages. The <code>Transformer</code> receives
+a <code>SceneCut</code> object, which contains the data that the <code>Transformer</code> needs to create animations,
+including the <code>Flow.Direction</code>, and the next (incoming) and previous (outgoing) stages.</p>
+
+<div class="highlight highlight-java"><pre>@<span class="kt">Singleton</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">HorizontalSlideTransformer</span> <span class="k">extends</span> <span class="no">TweenTransformer</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="kt">Params</span> params <span class="o">=</span> <span class="k">new</span> <span class="kt">Params</span>();
+
+    <span class="k">static</span> {
+        params<span class="o">.</span>forwardIn    <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_in_right;
+        params<span class="o">.</span>backIn       <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_in_left;
+        params<span class="o">.</span>backOut      <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_out_right;
+        params<span class="o">.</span>forwardOut   <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_out_left;
+    }
+
+    <span class="k">public</span> <span class="nf">HorizontalSlideTransformer</span>(<span class="kt">Application</span> <span class="nv">context</span>) {
+        <span class="nb">super</span>(context, params);
+    }
+}</pre></div>
+
+<p>Screenplay provides two <code>Transformer</code> implementations to extend from: <code>TweenTransformer</code>
+and <code>AnimatorTransformer</code>. TweenTransformer uses the <a href="http://developer.android.com/reference/android/view/animation/Animation.html">Animation</a> class, while
+the AnimatorTransformer uses the <a href="http://developer.android.com/reference/android/animation/Animator.html">Animator</a> class.</p>
+
+<h3>
+<a id="odds-and-ends" class="anchor" href="#odds-and-ends" aria-hidden="true"><span class="octicon octicon-link"></span></a>Odds and ends</h3>
+
+<p>The <code>Screenplay</code> object also exposes a <code>getScreenState()</code> method, which returns a <code>FlowState</code> object. This is
+useful for preventing multiple button presses while two Scenes are in transition:</p>
+
+<div class="highlight highlight-java"><pre>    @<span class="kt">Override</span>
+    <span class="k">public</span> <span class="kt">boolean</span> onOptionsItemSelected(<span class="kt">MenuItem</span> item) {
+        <span class="c1">// Ignore menu click if stage is transitioning</span>
+        <span class="k">if</span> (screenplay<span class="o">.</span>getScreenState() <span class="o">==</span> <span class="kt">SceneState</span><span class="no"><span class="o">.</span>TRANSITIONING</span>) <span class="k">return</span> <span class="kc">true</span>;
+
+        <span class="k">switch</span> (item<span class="o">.</span>getItemId()) {
+            <span class="m">...</span>
+        }
+    }</pre></div>
+
+<h3>
+<a id="mortar-support" class="anchor" href="#mortar-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mortar support</h3>
+
+<p>Screenplay provides support for (but does not require) Square's <a href="http://corner.squareup.com/2014/01/mortar-and-flow.html">Mortar</a>.
+It provides two classes, a <a href="https://github.com/weefbellington/screenplay/blob/master/library/src/main/java/com/davidstemmer/screenplay/MortarActivityDirector.java">MortarActivityDirector</a>
+and a <a href="https://github.com/weefbellington/screenplay/blob/master/library/src/main/java/com/davidstemmer/screenplay/scene/ScopedScene.java">ScopedScene</a>,
+which are designed to support applications powered by Mortar.</p>
+
+<h3>
+<a id="thats-all-folks" class="anchor" href="#thats-all-folks" aria-hidden="true"><span class="octicon octicon-link"></span></a>That's, all folks!</h3>
+
+<p>Screenplay is designed to be simple and extensible. It works well in concert with its friends
+Dagger, Flow, Butterknife and Mortar. You can see them all together in the <a href="https://github.com/weefbellington/screenplay/tree/master/sample/src/main">sample project</a>.</p>
+
+<p>Many thanks to the team at Square for their support of the open-source community, without which this project wouldn't be
+possible.</p>
+
+<p>Maven artifact is coming soon!</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/weefbellington/screenplay/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/weefbellington/screenplay/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/weefbellington/screenplay"></a> is maintained by <a href="https://github.com/weefbellington">weefbellington</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
