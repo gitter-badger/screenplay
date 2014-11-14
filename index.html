@@ -69,19 +69,19 @@ Pass this to the <code>Screenplay</code> and create a new <code>Flow</code>. In 
 configuration changes, these objects should be stored outside of your main Activity. One way to do
 this is by putting them in the Application class:</p>
 
-<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">SampleApplication</span> <span class="k">extends</span> <span class="no">Application</span> {
+<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">SampleApplication</span> <span class="pl-s">extends</span> <span class="pl-eoi">Application</span> {
 
-    <span class="k">public</span> <span class="k">final</span> <span class="kt">SimpleActivityDirector</span> director <span class="o">=</span> <span class="k">new</span> <span class="kt">SimpleActivityDirector</span>();
-    <span class="k">public</span> <span class="k">final</span> <span class="kt">Screenplay</span> screenplay <span class="o">=</span> <span class="k">new</span> <span class="kt">Screenplay</span>(director);
-    <span class="k">public</span> <span class="k">final</span> <span class="kt">Flow</span> mainFlow <span class="o">=</span> <span class="k">new</span> <span class="kt">Flow</span>(<span class="kt">Backstack</span><span class="o">.</span>single(<span class="k">new</span> <span class="kt">HomeScreen</span>()), screenplay);
-    <span class="k">private</span> <span class="kt">Application</span> application;
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">SimpleActivityDirector</span> director <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">SimpleActivityDirector</span>();
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">Screenplay</span> screenplay <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">Screenplay</span>(director);
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">Flow</span> mainFlow <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">Flow</span>(<span class="pl-s">Backstack</span><span class="pl-ko">.</span>single(<span class="pl-k">new</span> <span class="pl-s">HomeScreen</span>()), screenplay);
+    <span class="pl-s">private</span> <span class="pl-s">Application</span> application;
 
-    <span class="k">public</span> <span class="kt">void</span> <span class="nf">onCreate</span>() { application <span class="o">=</span> <span class="nb">this</span>; }
+    <span class="pl-s">public</span> <span class="pl-s">void</span> <span class="pl-enf">onCreate</span>() { application <span class="pl-ko">=</span> <span class="pl-v">this</span>; }
 
-    <span class="k">public</span> <span class="k">static</span> <span class="kt">SampleApplication</span> <span class="nf">getInstance</span>()   { <span class="k">return</span> application; }
-    <span class="k">public</span> <span class="k">static</span> <span class="kt">Director</span> <span class="nf">getDirector</span>()            { <span class="k">return</span> getInstance()<span class="o">.</span>director; }
-    <span class="k">public</span> <span class="k">static</span> <span class="kt">Screenplay</span> <span class="nf">getScreenplay</span>()        { <span class="k">return</span> getInstance()<span class="o">.</span>screenplay; }
-    <span class="k">public</span> <span class="k">static</span> <span class="kt">Flow</span> <span class="nf">getMainFlow</span>()                { <span class="k">return</span> getInstance()<span class="o">.</span>flow; }
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">SampleApplication</span> <span class="pl-enf">getInstance</span>()   { <span class="pl-k">return</span> application; }
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">Director</span> <span class="pl-enf">getDirector</span>()            { <span class="pl-k">return</span> getInstance()<span class="pl-ko">.</span>director; }
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">Screenplay</span> <span class="pl-enf">getScreenplay</span>()        { <span class="pl-k">return</span> getInstance()<span class="pl-ko">.</span>screenplay; }
+    <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">Flow</span> <span class="pl-enf">getMainFlow</span>()                { <span class="pl-k">return</span> getInstance()<span class="pl-ko">.</span>flow; }
 }</pre></div>
 
 <p><em>(alternatively, use a dependency injection library such as <a href="http://square.github.io/dagger/">Dagger</a>)</em></p>
@@ -89,19 +89,19 @@ this is by putting them in the Application class:</p>
 <p>Then, in the onCreate() method of your main Activity, bind your <code>Director</code> and call
 <code>Screenplay.enter(flow)</code> to initialize the screen state:</p>
 
-<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">MainActivity</span> <span class="k">extends</span> <span class="no">Activity</span> {
-    <span class="k">public</span> <span class="kt">void</span> <span class="nf">onCreate</span>(<span class="kt">Bundle</span> <span class="nv">savedInstanceState</span>) {
-        <span class="nb">super</span><span class="o">.</span>onCreate(savedInstanceState);
+<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">MainActivity</span> <span class="pl-s">extends</span> <span class="pl-eoi">Activity</span> {
+    <span class="pl-s">public</span> <span class="pl-s">void</span> <span class="pl-enf">onCreate</span>(<span class="pl-s">Bundle</span> <span class="pl-v">savedInstanceState</span>) {
+        <span class="pl-v">super</span><span class="pl-ko">.</span>onCreate(savedInstanceState);
 
-        setContentView(<span class="kt">R</span><span class="o">.</span>id<span class="o">.</span>main);
-        <span class="kt">RelativeLayout</span> container <span class="o">=</span> (<span class="kt">RelativeLayout</span>) activity<span class="o">.</span>findViewById(<span class="kt">R</span><span class="o">.</span>id<span class="o">.</span>main);
+        setContentView(<span class="pl-s">R</span><span class="pl-ko">.</span>id<span class="pl-ko">.</span>main);
+        <span class="pl-s">RelativeLayout</span> container <span class="pl-ko">=</span> (<span class="pl-s">RelativeLayout</span>) activity<span class="pl-ko">.</span>findViewById(<span class="pl-s">R</span><span class="pl-ko">.</span>id<span class="pl-ko">.</span>main);
 
-        <span class="kt">Director</span> director <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getDirector();
-        <span class="kt">Flow</span> flow <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getMainFlow();
-        <span class="kt">Screenplay</span> screenplay <span class="o">=</span> <span class="kt">SampleApplication</span><span class="o">.</span>getScreenplay();
+        <span class="pl-s">Director</span> director <span class="pl-ko">=</span> <span class="pl-s">SampleApplication</span><span class="pl-ko">.</span>getDirector();
+        <span class="pl-s">Flow</span> flow <span class="pl-ko">=</span> <span class="pl-s">SampleApplication</span><span class="pl-ko">.</span>getMainFlow();
+        <span class="pl-s">Screenplay</span> screenplay <span class="pl-ko">=</span> <span class="pl-s">SampleApplication</span><span class="pl-ko">.</span>getScreenplay();
 
-        director<span class="o">.</span>bind(<span class="nb">this</span>, container);
-        screenplay<span class="o">.</span>enter(flow);
+        director<span class="pl-ko">.</span>bind(<span class="pl-v">this</span>, container);
+        screenplay<span class="pl-ko">.</span>enter(flow);
     }
 }</pre></div>
 
@@ -110,19 +110,19 @@ were detached during configuration changes.</p>
 
 <p>Once you've created your Flow, navigation is the same as in any other Flow application:</p>
 
-<div class="highlight highlight-java"><pre>    flow<span class="o">.</span>goTo(<span class="k">new</span> <span class="kt">DetailScene</span>()); <span class="c1">// animates forward to the DetailScene</span>
-    flow<span class="o">.</span>goUp();                  <span class="c1">// animate back to the parent of the scene</span>
-    flow<span class="o">.</span>goBack();                <span class="c1">// animate back to the previous scene</span></pre></div>
+<div class="highlight highlight-java"><pre>    flow<span class="pl-ko">.</span>goTo(<span class="pl-k">new</span> <span class="pl-s">DetailScene</span>()); <span class="pl-c"><span class="pl-pdc">//</span> animates forward to the DetailScene</span>
+    flow<span class="pl-ko">.</span>goUp();                  <span class="pl-c"><span class="pl-pdc">//</span> animate back to the parent of the scene</span>
+    flow<span class="pl-ko">.</span>goBack();                <span class="pl-c"><span class="pl-pdc">//</span> animate back to the previous scene</span></pre></div>
 
 <p>One final detail: when the Activity is destroyed, is important to drop references to it to
 avoid memory leaks. Using the <code>SimpleActivityDirector</code>, you can drop the old Activity reference by
 calling <code>unbind()</code> in your Activity's <code>onDestroy()</code> callback.</p>
 
-<div class="highlight highlight-java"><pre>    @<span class="kt">Override</span>
-    <span class="k">public</span> <span class="kt">void</span> onDestroy() {
-        <span class="nb">super</span><span class="o">.</span>onDestroy()
-        <span class="k">if</span> (isFinishing()) {
-            director<span class="o">.</span>unbind()
+<div class="highlight highlight-java"><pre>    @<span class="pl-s">Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">void</span> onDestroy() {
+        <span class="pl-v">super</span><span class="pl-ko">.</span>onDestroy()
+        <span class="pl-k">if</span> (isFinishing()) {
+            director<span class="pl-ko">.</span>unbind()
         }
     }</pre></div>
 
@@ -140,29 +140,29 @@ the current view (<code>Scene.getView</code>).</p>
 to set up the scene. You can pass a list of <code>Component</code>s to the scene constructor, which can be used
 to apply behaviors after the scene is set up and before it is torn down:</p>
 
-<div class="highlight highlight-java"><pre>@Layout(<span class="kt">R</span><span class="o">.</span>layout<span class="o">.</span>dialog_scene)
-<span class="k">public</span> <span class="k">class</span> <span class="nc">DialogScene</span> <span class="k">extends</span> <span class="no">StandardScene</span> {
-    <span class="k">public</span> <span class="nf">DialogScene</span>(<span class="kt">DrawerLockingComponent</span> <span class="nv">component</span>) {
-        <span class="nb">super</span>(component);
+<div class="highlight highlight-java"><pre>@Layout(<span class="pl-s">R</span><span class="pl-ko">.</span>layout<span class="pl-ko">.</span>dialog_scene)
+<span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">DialogScene</span> <span class="pl-s">extends</span> <span class="pl-eoi">StandardScene</span> {
+    <span class="pl-s">public</span> <span class="pl-enf">DialogScene</span>(<span class="pl-s">DrawerLockingComponent</span> <span class="pl-v">component</span>) {
+        <span class="pl-v">super</span>(component);
     }
 }</pre></div>
 
-<div class="highlight highlight-java"><pre><span class="k">public</span> <span class="k">class</span> <span class="nc">DrawerLockingComponent</span> <span class="k">implements</span> <span class="no">Scene</span>.<span class="no">Component</span> {
+<div class="highlight highlight-java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">DrawerLockingComponent</span> <span class="pl-s">implements</span> <span class="pl-eoi">Scene</span>.<span class="pl-eoi">Component</span> {
 
-    <span class="k">private</span> <span class="k">final</span> <span class="kt">DrawerPresenter</span> drawer;
+    <span class="pl-s">private</span> <span class="pl-s">final</span> <span class="pl-s">DrawerPresenter</span> drawer;
 
-    <span class="k">public</span> <span class="nf">DrawerLockingComponent</span>(<span class="kt">DrawerPresenter</span> <span class="nv">drawer</span>) {
-        <span class="nb">this</span><span class="o">.</span>drawer <span class="o">=</span> drawer;
+    <span class="pl-s">public</span> <span class="pl-enf">DrawerLockingComponent</span>(<span class="pl-s">DrawerPresenter</span> <span class="pl-v">drawer</span>) {
+        <span class="pl-v">this</span><span class="pl-ko">.</span>drawer <span class="pl-ko">=</span> drawer;
     }
 
-    <span class="kt">@Override</span>
-    <span class="k">public</span> <span class="kt">void</span> <span class="nf">afterSetUp</span>(<span class="kt">Context</span> <span class="nv">context</span>, <span class="kt">Scene</span> <span class="nv">scene</span>) {
-        drawer<span class="o">.</span>setLocked(<span class="kc">true</span>);
+    <span class="pl-s">@Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">void</span> <span class="pl-enf">afterSetUp</span>(<span class="pl-s">Context</span> <span class="pl-v">context</span>, <span class="pl-s">Scene</span> <span class="pl-v">scene</span>) {
+        drawer<span class="pl-ko">.</span>setLocked(<span class="pl-c1">true</span>);
     }
 
-    <span class="kt">@Override</span>
-    <span class="k">public</span> <span class="kt">void</span> <span class="nf">beforeTearDown</span>(<span class="kt">Context</span> <span class="nv">context</span>, <span class="kt">Scene</span> <span class="nv">scene</span>) {
-        drawer<span class="o">.</span>setLocked(<span class="kc">false</span>);
+    <span class="pl-s">@Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">void</span> <span class="pl-enf">beforeTearDown</span>(<span class="pl-s">Context</span> <span class="pl-v">context</span>, <span class="pl-s">Scene</span> <span class="pl-v">scene</span>) {
+        drawer<span class="pl-ko">.</span>setLocked(<span class="pl-c1">false</span>);
     }
 }
 </pre></div>
@@ -184,25 +184,25 @@ dialogs, drawers and multi-pane layouts.</li>
 
 <p>Both the <code>PagedRigger</code> and the <code>ModalRigger</code> remove the Scene at the top of the stack when <code>Flow.goBack()</code> is called.</p>
 
-<div class="highlight highlight-java"><pre>@Layout(<span class="kt">R</span><span class="o">.</span>layout<span class="o">.</span>navigation_drawer)
-<span class="k">public</span> <span class="k">class</span> <span class="nc">NavigationDrawerScene</span> <span class="k">extends</span> <span class="no">StandardScene</span> {
+<div class="highlight highlight-java"><pre>@Layout(<span class="pl-s">R</span><span class="pl-ko">.</span>layout<span class="pl-ko">.</span>navigation_drawer)
+<span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">NavigationDrawerScene</span> <span class="pl-s">extends</span> <span class="pl-eoi">StandardScene</span> {
 
-    <span class="k">private</span> <span class="k">final</span> <span class="kt">ModalRigger</span> rigger;
-    <span class="k">private</span> <span class="k">final</span> <span class="kt">NavigationDrawerTransformer</span> transformer;
+    <span class="pl-s">private</span> <span class="pl-s">final</span> <span class="pl-s">ModalRigger</span> rigger;
+    <span class="pl-s">private</span> <span class="pl-s">final</span> <span class="pl-s">NavigationDrawerTransformer</span> transformer;
 
-    <span class="k">public</span> <span class="nf">NavigationDrawerScene</span>() {
-        <span class="nb">this</span><span class="o">.</span>rigger <span class="o">=</span> <span class="k">new</span> <span class="kt">ModalRigger</span>();
-        <span class="nb">this</span><span class="o">.</span>transformer <span class="o">=</span> <span class="k">new</span> <span class="kt">NavigationDrawerTransformer</span>();
+    <span class="pl-s">public</span> <span class="pl-enf">NavigationDrawerScene</span>() {
+        <span class="pl-v">this</span><span class="pl-ko">.</span>rigger <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">ModalRigger</span>();
+        <span class="pl-v">this</span><span class="pl-ko">.</span>transformer <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">NavigationDrawerTransformer</span>();
     }
 
-    <span class="kt">@Override</span>
-    <span class="k">public</span> <span class="kt">Rigger</span> <span class="nf">getRigger</span>() {
-        <span class="k">return</span> rigger;
+    <span class="pl-s">@Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">Rigger</span> <span class="pl-enf">getRigger</span>() {
+        <span class="pl-k">return</span> rigger;
     }
 
-    <span class="kt">@Override</span>
-    <span class="k">public</span> <span class="kt">Transformer</span> <span class="nf">getTransformer</span>() {
-        <span class="k">return</span> transition;
+    <span class="pl-s">@Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">Transformer</span> <span class="pl-enf">getTransformer</span>() {
+        <span class="pl-k">return</span> transition;
     }
 }</pre></div>
 
@@ -210,20 +210,20 @@ dialogs, drawers and multi-pane layouts.</li>
 a <code>SceneCut</code> object, which contains the data that the <code>Transformer</code> needs to create animations,
 including the <code>Flow.Direction</code>, and the next (incoming) and previous (outgoing) stages.</p>
 
-<div class="highlight highlight-java"><pre>@<span class="kt">Singleton</span>
-<span class="k">public</span> <span class="k">class</span> <span class="nc">HorizontalSlideTransformer</span> <span class="k">extends</span> <span class="no">TweenTransformer</span> {
+<div class="highlight highlight-java"><pre>@<span class="pl-s">Singleton</span>
+<span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-entc">HorizontalSlideTransformer</span> <span class="pl-s">extends</span> <span class="pl-eoi">TweenTransformer</span> {
 
-    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="kt">Params</span> params <span class="o">=</span> <span class="k">new</span> <span class="kt">Params</span>();
+    <span class="pl-s">private</span> <span class="pl-s">static</span> <span class="pl-s">final</span> <span class="pl-s">Params</span> params <span class="pl-ko">=</span> <span class="pl-k">new</span> <span class="pl-s">Params</span>();
 
-    <span class="k">static</span> {
-        params<span class="o">.</span>forwardIn    <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_in_right;
-        params<span class="o">.</span>backIn       <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_in_left;
-        params<span class="o">.</span>backOut      <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_out_right;
-        params<span class="o">.</span>forwardOut   <span class="o">=</span> <span class="kt">R</span><span class="o">.</span>anim<span class="o">.</span>slide_out_left;
+    <span class="pl-s">static</span> {
+        params<span class="pl-ko">.</span>forwardIn    <span class="pl-ko">=</span> <span class="pl-s">R</span><span class="pl-ko">.</span>anim<span class="pl-ko">.</span>slide_in_right;
+        params<span class="pl-ko">.</span>backIn       <span class="pl-ko">=</span> <span class="pl-s">R</span><span class="pl-ko">.</span>anim<span class="pl-ko">.</span>slide_in_left;
+        params<span class="pl-ko">.</span>backOut      <span class="pl-ko">=</span> <span class="pl-s">R</span><span class="pl-ko">.</span>anim<span class="pl-ko">.</span>slide_out_right;
+        params<span class="pl-ko">.</span>forwardOut   <span class="pl-ko">=</span> <span class="pl-s">R</span><span class="pl-ko">.</span>anim<span class="pl-ko">.</span>slide_out_left;
     }
 
-    <span class="k">public</span> <span class="nf">HorizontalSlideTransformer</span>(<span class="kt">Application</span> <span class="nv">context</span>) {
-        <span class="nb">super</span>(context, params);
+    <span class="pl-s">public</span> <span class="pl-enf">HorizontalSlideTransformer</span>(<span class="pl-s">Application</span> <span class="pl-v">context</span>) {
+        <span class="pl-v">super</span>(context, params);
     }
 }</pre></div>
 
@@ -237,13 +237,13 @@ the AnimatorTransformer uses the <a href="http://developer.android.com/reference
 <p>The <code>Screenplay</code> object also exposes a <code>getScreenState()</code> method, which returns a <code>FlowState</code> object. This is
 useful for preventing multiple button presses while two Scenes are in transition:</p>
 
-<div class="highlight highlight-java"><pre>    @<span class="kt">Override</span>
-    <span class="k">public</span> <span class="kt">boolean</span> onOptionsItemSelected(<span class="kt">MenuItem</span> item) {
-        <span class="c1">// Ignore menu click if stage is transitioning</span>
-        <span class="k">if</span> (screenplay<span class="o">.</span>getScreenState() <span class="o">==</span> <span class="kt">SceneState</span><span class="no"><span class="o">.</span>TRANSITIONING</span>) <span class="k">return</span> <span class="kc">true</span>;
+<div class="highlight highlight-java"><pre>    @<span class="pl-s">Override</span>
+    <span class="pl-s">public</span> <span class="pl-s">boolean</span> onOptionsItemSelected(<span class="pl-s">MenuItem</span> item) {
+        <span class="pl-c"><span class="pl-pdc">//</span> Ignore menu click if stage is transitioning</span>
+        <span class="pl-k">if</span> (screenplay<span class="pl-ko">.</span>getScreenState() <span class="pl-ko">==</span> <span class="pl-s">SceneState</span><span class="pl-c1"><span class="pl-ko">.</span>TRANSITIONING</span>) <span class="pl-k">return</span> <span class="pl-c1">true</span>;
 
-        <span class="k">switch</span> (item<span class="o">.</span>getItemId()) {
-            <span class="m">...</span>
+        <span class="pl-k">switch</span> (item<span class="pl-ko">.</span>getItemId()) {
+            <span class="pl-cn">...</span>
         }
     }</pre></div>
 
