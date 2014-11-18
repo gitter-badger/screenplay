@@ -57,8 +57,11 @@ public class Screenplay implements Flow.Listener {
             incomingScene.getTransformer().applyAnimations(sceneCut, this);
         }
         else if (outgoingScene != null) {
-            outgoingScene.getRigger().layoutIncoming(director.getContainer(), outgoingScene.getView(), direction);
+            outgoingScene.getRigger().layoutOutgoing(director.getContainer(), outgoingScene.getView(), direction);
             outgoingScene.getTransformer().applyAnimations(sceneCut, this);
+
+            incomingScene.getRigger().layoutIncoming(director.getContainer(), incomingScene.getView(), direction);
+            incomingScene.getTransformer().applyAnimations(sceneCut, this);
         }
         else {
             // backward, previous scene is null (?)
